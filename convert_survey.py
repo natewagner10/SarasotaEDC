@@ -19,10 +19,10 @@ import pytesseract
 
 
 
-from PyPDF2 import PdfFileWriter, PdfFileReader
+# from PyPDF2 import PdfFileWriter, PdfFileReader
 
-pdf_document = "/Users/natewagner/Documents/Surveys/batch01.pdf"
-pdf = PdfFileReader(pdf_document)
+# pdf_document = "/Users/natewagner/Documents/Surveys/batch18.pdf"
+# pdf = PdfFileReader(pdf_document)
 
 # for page in range(pdf.getNumPages()):
 #     pdf_writer = PdfFileWriter()
@@ -47,7 +47,7 @@ import pandas as pd
 def parseCheckYN(page):
 
     # set path
-    setpath = '/Users/natewagner/Documents/Surveys/batch1/'
+    setpath = '/Users/natewagner/Documents/Surveys/'
     path = setpath + page
     
     # Convert to png and to greyscale / rotate
@@ -60,7 +60,7 @@ def parseCheckYN(page):
     
     
     # extract account number
-    accnt_num_dims = (1000+155, 150-140, 1600-200, 75)
+    accnt_num_dims = (1000+155, 150-140, 1600-200, 60)
     accnt_num = images_bw.crop(accnt_num_dims)    
     accnt_number = pytesseract.image_to_string(accnt_num)
     
@@ -72,27 +72,32 @@ def parseCheckYN(page):
     
     
     # question 2
-    question2_dims = (150-40, 783+145, 290+10, 923+195)
+    question2_dims = (150-40, 783+210, 290+10, 923+125)
     question2 = images_bw.crop(question2_dims)    
-    Q2p = []
-    for pixel in iter(question2.getdata()):
-        Q2p.append(pixel)
+    q2 = Image.new('L', (190, 190))
+    q2.paste(question2, (0, 60))
     
+    Q2p = []
+    for pixel in iter(q2.getdata()):
+        Q2p.append(pixel)
+        
     q2df = pd.DataFrame(Q2p).transpose()
     q2df['question'] = 'question2'
     q2df['accnt_num'] = accnt_number
     q2df['bus_name'] = bus_name
-    #q2df.head(20)
     
     
     
     # question 3
-    question3_dims = (135-30, 860+80, 275+20, 1000+130)
-    question3 = images_bw.crop(question3_dims) 
+    question3_dims = (135-30, 860+130, 275+20, 1000+60)
+    question3 = images_bw.crop(question3_dims)
+    q3 = Image.new('L', (190, 190))
+    q3.paste(question3, (0, 60))
     Q3p = []
-    for pixel in iter(question3.getdata()):
+
+    for pixel in iter(q3.getdata()):
         Q3p.append(pixel)
-    
+
     q3df = pd.DataFrame(Q3p).transpose()
     q3df['question'] = 'question3'
     q3df['accnt_num'] = accnt_number
@@ -101,12 +106,15 @@ def parseCheckYN(page):
     
     
     # question 4
-    question4_dims = (115, 1070, 305, 1070+190)
+    question4_dims = (115, 1070+63, 305, 1070+135)
     question4 = images_bw.crop(question4_dims) 
-    Q4p = []
-    for pixel in iter(question4.getdata()):
-        Q4p.append(pixel)
+    q4 = Image.new('L', (190, 190))
+    q4.paste(question4, (0, 60))
     
+    Q4p = []
+    for pixel in iter(q4.getdata()):
+        Q4p.append(pixel)
+
     q4df = pd.DataFrame(Q4p).transpose()
     q4df['question'] = 'question4'
     q4df['accnt_num'] = accnt_number
@@ -115,12 +123,15 @@ def parseCheckYN(page):
     
     
     # question 8
-    question8_dims = (1060+300, 928-250, 1250+300, 1118-250)
+    question8_dims = (1060+300, 928-185, 1250+300, 1118-315)
     question8 = images_bw.crop(question8_dims) 
-    Q8p = []
-    for pixel in iter(question8.getdata()):
-        Q8p.append(pixel)
+    q8 = Image.new('L', (190, 190))
+    q8.paste(question8, (0, 60))
     
+    Q8p = []
+    for pixel in iter(q8.getdata()):
+        Q8p.append(pixel)
+
     q8df = pd.DataFrame(Q8p).transpose()
     q8df['question'] = 'question8'
     q8df['accnt_num'] = accnt_number
@@ -129,12 +140,15 @@ def parseCheckYN(page):
     
     
     # question 9
-    question9_dims = (1060+112, 928-180, 1250+112, 1118-180)
+    question9_dims = (1060+112, 928-100, 1250+112, 1118-240)
     question9 = images_bw.crop(question9_dims) 
-    Q9p = []
-    for pixel in iter(question9.getdata()):
-        Q9p.append(pixel)
+    q9 = Image.new('L', (190, 190))
+    q9.paste(question9, (0, 60))
     
+    Q9p = []
+    for pixel in iter(q9.getdata()):
+        Q9p.append(pixel)
+        
     q9df = pd.DataFrame(Q9p).transpose()
     q9df['question'] = 'question9'
     q9df['accnt_num'] = accnt_number
@@ -143,26 +157,36 @@ def parseCheckYN(page):
     check_YN_data = pd.concat([q2df, q3df, q4df, q8df, q9df])
     check_YN_data['survey'] = str(page)
     
+    
     return(check_YN_data)
     
 
 
 
 
-survey_num = 'survey-page-'
+sum([100, 82, 85, 46, 81, 120, 100, 100, 91])
+
+pdfs = [66, 99, 123, 94, 137, 100, 92, 138, 164, 100, 82, 85, 46, 81, 120, 100, 100, 91]
+#pdfs = [100, 82, 85, 46, 81, 120, 100, 100, 91]
+
+batch = 'batch'
+survey_num = '/survey-page-'
 end = '.pdf'
-checkYN_batch1 = pd.DataFrame()
-for x in range(1, 67):
-    survey = survey_num + str(x) + end
-    df = parseCheckYN(survey)
-    checkYN_batch1 = checkYN_batch1.append(df)
-    
+checkYN = pd.DataFrame()
+for pages in range(10, 19):
+    for x in range(1, pdfs[pages-1]+1):
+        survey = batch + str(pages) + survey_num + str(x) + end        
+        df = parseCheckYN(survey)
+        checkYN = checkYN.append(df)
+    checkYN['batch'] = str(pages)
+    print(pages)
 
-checkYN_batch1.head(10)
-checkYN_batch1.shape
-checkYN_batch1['batch'] = 'batch1'
 
-checkYN_batch1.to_csv('/Users/natewagner/Documents/Surveys/checkYN_batch1.csv', encoding='utf-8', index = False)
+checkYN.head(10)
+checkYN.shape
+
+
+#checkYN.to_csv('/Users/natewagner/Documents/Surveys/checkYN_second_half.csv', encoding='utf-8', index = False)
 
 
 
@@ -170,30 +194,43 @@ checkYN_batch1.to_csv('/Users/natewagner/Documents/Surveys/checkYN_batch1.csv', 
 
 
 # checking to see if we have accnt num or bus name
-acc = checkYN_batch1['accnt_num']
-bn = checkYN_batch1['bus_name']
-dff = pd.concat([acc,bn], axis = 1)
-dff['batch'] = 'batch1'
-dff.to_csv('/Users/natewagner/Documents/Surveys/dff.csv', encoding='utf-8', index = False)
+acc = checkYN['accnt_num']
+bn = checkYN['bus_name']
+batch = checkYN['batch']
+survey = checkYN['survey']
+
+dff2 = pd.concat([acc,bn,batch,survey], axis = 1)
+dff2 = dff2.drop_duplicates()
+dff2.shape
+#dff2.to_csv('/Users/natewagner/Documents/Surveys/checkYN_second_half_compslist.csv', encoding='utf-8', index = False)
+
+
+#scan1_company_list = dff.append(dff2)
+#scan1_company_list.to_csv('/Users/natewagner/Documents/Surveys/scan1_company_list.csv', encoding='utf-8', index = False)
 
 
 
 
 
+# just playing around here
 
+dff.head(10)
 
-
-
-
-
-
-
-
-
-
-
-
-
+items = []
+for line in dff.iloc[:,0]:
+    num = line.strip().replace("_", "")
+    num = num.replace("-", "")
+    num = num.replace(",", "")
+    num = num.replace(":", "")
+    num = num.replace(".", "")
+    items.append(num)
+ 
+    
+test = "BVUYT To4de"
+abc = "abcdefghijklmnop"
+for x in test.lower():
+    print(x in abc)
+    
 
 
 
