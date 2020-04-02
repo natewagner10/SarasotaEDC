@@ -232,9 +232,9 @@ def downscale_image(im, max_dim=2048):
     return scale, new_im
 
 
-def process_image(path, out_path):
+def process_image(im):
 
-    orig_im = Image.open(path)
+    orig_im = im
     scale, im = downscale_image(orig_im)
 
     edges = cv2.Canny(np.asarray(im), 100, 200)
@@ -280,8 +280,10 @@ def process_image(path, out_path):
     #orig_im.save(out_path)
     #im.show()
     text_im = orig_im.crop(crop)
-    text_im.save(out_path)
-    print('%s -> %s' % (path, out_path))
+    
+    return(text_im)
+    #text_im.save(out_path)
+    #print('%s -> %s' % (path, out_path))
 
 
 if __name__ == '__main__':
@@ -301,8 +303,10 @@ if __name__ == '__main__':
             print('%s %s' % (path, e))
             
             
-            
-process_image("/Users/natewagner/Documents/testimg.png", "/Users/natewagner/Documents/image_test.png")      
-process_image("/Users/natewagner/Documents/testimg2.png", "/Users/natewagner/Documents/image_test2.png")      
+te = Image.open("/Users/natewagner/Documents/testimg.png")
+ex = process_image(te)
+
+
+  
             
             
