@@ -305,8 +305,3 @@ if __name__ == '__main__':
             
 te = Image.open("/Users/natewagner/Documents/testimg.png")
 ex = process_image(te)
-
-
-  
-            
-            
